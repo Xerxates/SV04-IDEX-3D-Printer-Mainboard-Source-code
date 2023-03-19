@@ -45,6 +45,7 @@ float last_zoffset = 0.0;
 
 const float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 60};
 
+
 int startprogress = 0;
 float pause_z = 0;
 float pause_e = 0;
@@ -393,9 +394,8 @@ void RTSSHOW::RTS_Init()
   last_target_temperature[1] = thermalManager.temp_hotend[1].target;
   feedrate_percentage = 100;
   RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
-  RTS_SndData(flowrate_percentage_e0, FLOW_RATE_E0_VP);
-  RTS_SndData(flowrate_percentage_e1, FLOW_RATE_E1_VP);
-
+  RTS_SndData(planner.flow_percentage[0], FLOW_RATE_E0_VP);
+  RTS_SndData(planner.flow_percentage[1], FLOW_RATE_E1_VP);
   /***************turn off motor*****************/
   RTS_SndData(1, MOTOR_FREE_ICON_VP);
 
@@ -735,7 +735,7 @@ void RTSSHOW::RTS_SDcard_Stop()
     #endif
   }
   #ifdef EVENT_GCODE_SD_ABORT
-    queue.inject_P(PSTR(EVENT_GCODE_SD_ABORT));
+      queue.inject(PSTR(EVENT_GCODE_SD_ABORT));
   #endif
 
   // shut down the stepper motor.
@@ -1374,7 +1374,7 @@ void RTSSHOW::RTS_HandleData()
       }
       else if (recdat.data[0] == 6)
       {
-        queue.enqueue_now_P(PSTR("M84"));
+        queue.enqueue_now_P(PSTR("M18 X Y E"));
         RTS_SndData(1, MOTOR_FREE_ICON_VP);
       }
       else if (recdat.data[0] == 7)
