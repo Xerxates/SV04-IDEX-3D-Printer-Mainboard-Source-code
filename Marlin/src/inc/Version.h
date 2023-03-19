@@ -25,7 +25,7 @@
  * Release version. Leave the Marlin version or apply a custom scheme.
  */
 #ifndef SHORT_BUILD_VERSION
-  #define SHORT_BUILD_VERSION "V1.1.B3.4"
+  #define SHORT_BUILD_VERSION "V1.1.B3.4-X1.1"
 #endif
 
 /**
@@ -67,7 +67,7 @@
  * (Other behaviors are given by the firmware version and capabilities report.)
  */
 #ifndef PROTOCOL_VERSION
-  #define PROTOCOL_VERSION "1.1.B3.4"
+  #define PROTOCOL_VERSION "1.1.B3.3"
 #endif
 
 /**

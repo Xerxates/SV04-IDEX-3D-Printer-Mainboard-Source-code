@@ -52,6 +52,8 @@ bool sdcard_pause_check = true;
 bool print_preheat_check = false;
 float ChangeFilament0Temp = 200;
 float ChangeFilament1Temp = 200;
+uint8_t flowrate_percentage_e0 = 100;
+uint8_t flowrate_percentage_e1 = 100;
 
 float current_position_x0_axis = X_MIN_POS;
 float current_position_x1_axis = X2_MAX_POS;
@@ -391,6 +393,8 @@ void RTSSHOW::RTS_Init()
   last_target_temperature[1] = thermalManager.temp_hotend[1].target;
   feedrate_percentage = 100;
   RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
+  RTS_SndData(flowrate_percentage_e0, FLOW_RATE_E0_VP);
+  RTS_SndData(flowrate_percentage_e1, FLOW_RATE_E1_VP);
 
   /***************turn off motor*****************/
   RTS_SndData(1, MOTOR_FREE_ICON_VP);
@@ -844,8 +848,8 @@ void RTSSHOW::RTS_HandleData()
     case AdjustmentKey:
       if(recdat.data[0] == 1)
       {
-        thermalManager.fan_speed[0] ? RTS_SndData(0, HEAD0_FAN_ICON_VP) : RTS_SndData(1, HEAD0_FAN_ICON_VP);
-        thermalManager.fan_speed[1] ? RTS_SndData(0, HEAD1_FAN_ICON_VP) : RTS_SndData(1, HEAD1_FAN_ICON_VP);
+        RTS_SndData((int)round(thermalManager.fan_speed[0]/2.55), FAN_SPEED_E0_VP);
+        RTS_SndData((int)round(thermalManager.fan_speed[1]/2.55), FAN_SPEED_E1_VP);
         RTS_SndData(probe.offset.z * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
         RTS_SndData(ExchangePageBase + 14, ExchangepageAddr);
       }
@@ -890,6 +894,32 @@ void RTSSHOW::RTS_HandleData()
       RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
       break;
 
+    case FlowRateE0Key:
+      flowrate_percentage_e0 = recdat.data[0];
+      RTS_SndData(flowrate_percentage_e0, FLOW_RATE_E0_VP);
+      char cmd0[20];
+      sprintf_P(cmd0, "M221 S%d T0", flowrate_percentage_e0);
+      queue.inject(PSTR(cmd0));
+      break;
+
+    case FlowRateE1Key:
+      flowrate_percentage_e1 = recdat.data[0];
+      RTS_SndData(flowrate_percentage_e1, FLOW_RATE_E1_VP);
+      char cmd1[20];
+      sprintf_P(cmd1, "M221 S%d T1", flowrate_percentage_e1);
+      queue.inject(PSTR(cmd1));
+      break;
+    
+    case FanSpeedE0Key:
+      thermalManager.set_fan_speed(0, round(recdat.data[0] * 2.55));
+      RTS_SndData((int)round(thermalManager.fan_speed[0]/2.55), FAN_SPEED_E0_VP);
+      break;
+
+    case FanSpeedE1Key:
+      thermalManager.set_fan_speed(1, round(recdat.data[0] * 2.55));
+      RTS_SndData((int)round(thermalManager.fan_speed[1]/2.55), FAN_SPEED_E1_VP);
+      break;
+
     case StopPrintKey:
       if((recdat.data[0] == 1) || (recdat.data[0] == 0xF1))
       {
@@ -902,7 +932,9 @@ void RTSSHOW::RTS_HandleData()
         Update_Time_Value = 0;
         PrintFlag = 0;
         TERN_(HOST_PAUSE_M76, host_action_cancel());
-        queue.inject_P(PSTR("M77"));
+        char cmd[] = "M77";
+        queue.inject(PSTR(cmd));
+        RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
       }
       else if(recdat.data[0] == 0xF0)
       {
@@ -937,8 +969,9 @@ void RTSSHOW::RTS_HandleData()
         Update_Time_Value = 0;
         sdcard_pause_check = false;
         PrintFlag = 1;
-        change_page_number = 12;
-        queue.inject_P(PSTR("M76"));
+        char cmd[] = "M76";
+        queue.inject(PSTR(cmd));
+        RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
       }
       break;
 

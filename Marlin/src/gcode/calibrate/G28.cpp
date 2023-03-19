@@ -480,12 +480,9 @@ void GcodeSuite::G28() {
 
       TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(saved_motion_state));
     }
-    else if((save_dual_x_carriage_mode == 4) && card.isPrinting()){
-      // Home the 1st (left) extruder
-      active_extruder = 0;
-      homeaxis(X_AXIS);
-
-    }
+    // Home the 1st (left) extruder
+    active_extruder = 0;
+    homeaxis(X_AXIS);
 
   #endif // DUAL_X_CARRIAGE
 

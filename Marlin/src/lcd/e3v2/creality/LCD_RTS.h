@@ -119,6 +119,11 @@ extern int power_off_type_yes;
 //#define FILE19_SELECT_ICON_VP              0x1233
 //#define FILE20_SELECT_ICON_VP              0x1234
 
+#define FLOW_RATE_E0_VP                       0x1300
+#define FLOW_RATE_E1_VP                       0x1302
+#define FAN_SPEED_E0_VP                       0x1304
+#define FAN_SPEED_E1_VP                       0x1306
+
 #define PAGE_STATUS_TEXT_VP                0x201E
 #define FILE1_TEXT_VP                      0x205A
 //#define FILE3_TEXT_VP                      0x2032
@@ -254,7 +259,11 @@ enum PROC_COM
   PrintFileKey,
   SelectFileKey,
   SaveEEPROM,
-  ChangePageKey
+  ChangePageKey,
+  FlowRateE0Key,
+  FlowRateE1Key,
+  FanSpeedE0Key,
+  FanSpeedE1Key
 };
 
 const unsigned long Addrbuf[] = 
@@ -294,6 +303,10 @@ const unsigned long Addrbuf[] =
   0x2199,
   0X2202,
   0x110E,
+  0x1300,
+  0x1302,
+  0x1304,
+  0x1306,
   0
 };
 

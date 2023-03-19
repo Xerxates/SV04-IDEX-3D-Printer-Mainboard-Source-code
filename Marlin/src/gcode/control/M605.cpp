@@ -81,7 +81,6 @@
             SetExtruderMode(4, false);
           #endif
           break;
-
         case DXC_AUTO_PARK_MODE:
           #if ENABLED(RTS_AVAILABLE)
             SetExtruderMode(1, false);
@@ -117,6 +116,7 @@
           #if ENABLED(RTS_AVAILABLE)
             SetExtruderMode(3, false);
           #endif
+          
         } return;
 
         default:
