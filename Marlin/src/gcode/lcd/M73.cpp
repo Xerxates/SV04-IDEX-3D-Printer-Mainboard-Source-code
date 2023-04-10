@@ -22,15 +22,16 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if ENABLED(LCD_SET_PROGRESS_MANUALLY)
+#if ENABLED(SET_PROGRESS_MANUALLY)
 
 #include "../gcode.h"
 #include "../../lcd/marlinui.h"
 #include "../../sd/cardreader.h"
+#include "../../libs/numtostr.h"
 #include "../../module/printcounter.h"
 
-#if ENABLED(DWIN_CREALITY_LCD_ENHANCED)
-  #include "../../lcd/e3v2/enhanced/dwin.h"
+#if ENABLED(DWIN_LCD_PROUI)
+  #include "../../lcd/e3v2/proui/dwin.h"
 #endif
 
 #if ENABLED(RTS_AVAILABLE)
@@ -41,7 +42,15 @@
  * M73: Set percentage complete (for display on LCD)
  *
  * Example:
- *   M73 P25 ; Set progress to 25%
+ *   M73 P25.63 ; Set progress to 25.63%
+ *   M73 R456   ; Set remaining time to 456 minutes
+ *   M73 C12    ; Set next interaction countdown to 12 minutes
+ *   M73        ; Report current values
+ *
+ * M73 Progress: ---%; Time left: -----m; Change: -----m;
+ *
+ * When PRINT_PROGRESS_SHOW_DECIMALS is enabled - reports percent with 100% / 23.4% / 3.45% format
+ *
  */
 void GcodeSuite::M73() {
 
@@ -50,7 +59,7 @@ void GcodeSuite::M73() {
 
   #if ENABLED(DWIN_CREALITY_LCD_ENHANCED)
 
-    DWIN_Progress_Update();
+    DWIN_M73();
 
   #elif ENABLED(RTS_AVAILABLE)
     if (parser.seenval('P')) {
@@ -67,7 +76,7 @@ void GcodeSuite::M73() {
       rtscheck.RTS_SndData((elapsed.value % 3600) / 60, PRINT_TIME_MIN_VP);
     }
 
-    #if ENABLED(USE_M73_REMAINING_TIME)
+    #if ENABLED(SET_REMAINING_TIME)
       if (parser.seenval('R')) {
         remaining_time = 60 * parser.value_ulong();
         rtscheck.RTS_SndData(remaining_time / 3600, PRINT_SURPLUS_TIME_HOUR_VP);
@@ -83,7 +92,7 @@ void GcodeSuite::M73() {
       );
     }
 
-    #if ENABLED(USE_M73_REMAINING_TIME)
+    #if ENABLED(SET_REMAINING_TIME)
       if (parser.seenval('R')) {
         ui.set_remaining_time(60 * parser.value_ulong());
       }
@@ -91,4 +100,4 @@ void GcodeSuite::M73() {
   #endif
 }
 
-#endif // LCD_SET_PROGRESS_MANUALLY
+#endif // SET_PROGRESS_MANUALLY

@@ -25,7 +25,7 @@
  * Release version. Leave the Marlin version or apply a custom scheme.
  */
 #ifndef SHORT_BUILD_VERSION
-  #define SHORT_BUILD_VERSION "V1.1.B3.4-X1.1"
+  #define SHORT_BUILD_VERSION "V1.2.0 (2.1.2)"
 #endif
 
 /**
@@ -43,7 +43,7 @@
  * version was tagged.
  */
 #ifndef STRING_DISTRIBUTION_DATE
-  #define STRING_DISTRIBUTION_DATE "2021-12-22"
+  #define STRING_DISTRIBUTION_DATE "2022-12-17"
 #endif
 
 /**
@@ -53,7 +53,7 @@
  * to alert users to major changes.
  */
 
-#define MARLIN_HEX_VERSION 02000902
+#define MARLIN_HEX_VERSION 02010200
 #ifndef REQUIRED_CONFIGURATION_H_VERSION
   #define REQUIRED_CONFIGURATION_H_VERSION MARLIN_HEX_VERSION
 #endif
@@ -67,7 +67,7 @@
  * (Other behaviors are given by the firmware version and capabilities report.)
  */
 #ifndef PROTOCOL_VERSION
-  #define PROTOCOL_VERSION "1.1.B3.3"
+  #define PROTOCOL_VERSION "1.1.0"
 #endif
 
 /**
@@ -83,7 +83,7 @@
  * providing the source code to your customers.)
  */
 #ifndef SOURCE_CODE_URL
-  #define SOURCE_CODE_URL "https://github.com/bphillips09/SV04-IDEX-3D-Printer-Mainboard-Source-code"
+  #define SOURCE_CODE_URL "github.com/MarlinFirmware/Marlin"
 #endif
 
 /**

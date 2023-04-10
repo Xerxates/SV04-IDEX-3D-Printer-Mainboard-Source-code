@@ -50,7 +50,11 @@
 #define X_STOP_PIN                             3
 #define Y_STOP_PIN                            14
 
-#include "pins_3DRAG.h"
+#if EITHER(BLTOUCH, TOUCH_MI_PROBE)
+  #define HAS_INVERTED_PROBE
+#endif
+
+#include "pins_3DRAG.h" // ... RAMPS
 
 //
 // Heaters / Fans

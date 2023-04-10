@@ -28,7 +28,6 @@
 
 #include "../gcode.h"
 #include "../../module/motion.h"
-#include "../../module/stepper.h"
 #include "../../module/tool_change.h"
 #include "../../module/planner.h"
 
@@ -68,7 +67,7 @@
   void GcodeSuite::M605() {
     planner.synchronize();
 
-    if (parser.seen('S')) {
+    if (parser.seenval('S')) {
       const DualXMode previous_mode = dual_x_carriage_mode;
 
       dual_x_carriage_mode = (DualXMode)parser.value_byte();
@@ -77,25 +76,15 @@
       switch (dual_x_carriage_mode) {
 
         case DXC_FULL_CONTROL_MODE:
-          #if ENABLED(RTS_AVAILABLE)
-            SetExtruderMode(4, false);
-          #endif
           break;
         case DXC_AUTO_PARK_MODE:
-          #if ENABLED(RTS_AVAILABLE)
-            SetExtruderMode(1, false);
-          #endif
           break;
-
         case DXC_DUPLICATION_MODE:
           // Set the X offset, but no less than the safety gap
-          if (parser.seen('X')) duplicate_extruder_x_offset = _MAX(parser.value_linear_units(), (82) - (X1_MIN_POS));
-          if (parser.seen('R')) duplicate_extruder_temp_offset = parser.value_celsius_diff();
+          if (parser.seenval('X')) duplicate_extruder_x_offset = _MAX(parser.value_linear_units(), (X2_MIN_POS) - (X1_MIN_POS));
+          if (parser.seenval('R')) duplicate_extruder_temp_offset = parser.value_celsius_diff();
           // Always switch back to tool 0
           if (active_extruder != 0) tool_change(0);
-          #if ENABLED(RTS_AVAILABLE)
-            SetExtruderMode(2, false);
-          #endif
           break;
 
         case DXC_MIRRORED_MODE: {
@@ -113,9 +102,6 @@
             planner.buffer_line(dest, feedrate_mm_s, 0);
             dest.x += 0.1f;
           }
-          #if ENABLED(RTS_AVAILABLE)
-            SetExtruderMode(3, false);
-          #endif
           
         } return;
 
@@ -128,7 +114,7 @@
       set_duplication_enabled(false);
 
       #ifdef EVENT_GCODE_IDEX_AFTER_MODECHANGE
-        gcode.process_subcommands_now_P(PSTR(EVENT_GCODE_IDEX_AFTER_MODECHANGE));
+        process_subcommands_now(F(EVENT_GCODE_IDEX_AFTER_MODECHANGE));
       #endif
     }
     else if (!parser.seen('W'))  // if no S or W parameter, the DXC mode gets reset to the user's default
@@ -164,7 +150,7 @@
 
         HOTEND_LOOP() {
           DEBUG_ECHOPGM_P(SP_T_STR, e);
-          LOOP_LINEAR_AXES(a) DEBUG_ECHOPGM("  hotend_offset[", e, "].", AS_CHAR(AXIS_CHAR(a) | 0x20), "=", hotend_offset[e][a]);
+          LOOP_NUM_AXES(a) DEBUG_ECHOPGM("  hotend_offset[", e, "].", AS_CHAR(AXIS_CHAR(a) | 0x20), "=", hotend_offset[e][a]);
           DEBUG_EOL();
         }
         DEBUG_EOL();

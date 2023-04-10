@@ -21,7 +21,7 @@
 #include "../../../gcode/gcode.h"
 #include "../../../module/probe.h"
 
-#include "../../../feature/bedlevel/abl/abl.h"
+#include "../../../feature/bedlevel/abl/bbl.h"
 
 #if ENABLED(HOST_ACTION_COMMANDS)
   #include "../../../feature/host_actions.h"
@@ -377,7 +377,7 @@ void RTSSHOW::RTS_Init()
       zig ^= true;
       for (int x = inStart; x != inStop; x += inInc)
       {
-        RTS_SndData(z_values[x][y] * 1000, AUTO_BED_LEVEL_1POINT_VP + showcount * 2);
+        RTS_SndData(bedlevel.z_values[x][y] * 1000, AUTO_BED_LEVEL_1POINT_VP + showcount * 2);
         showcount++;
       }
     }
@@ -931,7 +931,7 @@ void RTSSHOW::RTS_HandleData()
         RTS_SDcard_Stop();
         Update_Time_Value = 0;
         PrintFlag = 0;
-        TERN_(HOST_PAUSE_M76, host_action_cancel());
+        TERN_(HOST_PAUSE_M76, hostui.cancel());
         char cmd[] = "M77";
         queue.inject(PSTR(cmd));
         RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
@@ -992,7 +992,7 @@ void RTSSHOW::RTS_HandleData()
         RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
         PrintFlag = 2;
         queue.enqueue_now_P(PSTR("M75"));
-        TERN_(HOST_PAUSE_M76, host_action_resume());
+        TERN_(HOST_PAUSE_M76, hostui.resume());
       }
       else if(recdat.data[0] == 2)
       {
@@ -1005,7 +1005,7 @@ void RTSSHOW::RTS_HandleData()
         PrintFlag = 2;
         RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
         queue.enqueue_now_P(PSTR("M75"));
-        TERN_(HOST_PAUSE_M76, host_action_resume());
+        TERN_(HOST_PAUSE_M76, hostui.resume());
       }
       else if(recdat.data[0] == 3)
       {
@@ -1070,7 +1070,7 @@ void RTSSHOW::RTS_HandleData()
           sd_printing_autopause = true;
           RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
           queue.enqueue_now_P(PSTR("M75"));
-          TERN_(HOST_PAUSE_M76, host_action_resume());
+          TERN_(HOST_PAUSE_M76, hostui.resume());
         }
       }
       break;
@@ -1329,7 +1329,7 @@ void RTSSHOW::RTS_HandleData()
         AxisUnitMode = 3;
         if(active_extruder == 0)
         {
-          if(TEST(axis_trusted, X_AXIS))
+          if(TEST(axes_trusted, X_AXIS))
           {
             current_position_x0_axis = current_position[X_AXIS];
           }
@@ -1344,7 +1344,7 @@ void RTSSHOW::RTS_HandleData()
         }
         else if(active_extruder == 1)
         {
-          if(TEST(axis_trusted, X_AXIS))
+          if(TEST(axes_trusted, X_AXIS))
           {
             current_position_x1_axis = current_position[X_AXIS];
           }
@@ -1429,7 +1429,7 @@ void RTSSHOW::RTS_HandleData()
       if (recdat.data[0] == 1)
       {
         waitway = 6;
-        if((active_extruder == 1) || (!TEST(axis_trusted, X_AXIS)) || (!TEST(axis_trusted, Y_AXIS)))
+        if((active_extruder == 1) || (!TEST(axes_trusted, X_AXIS)) || (!TEST(axes_trusted, Y_AXIS)))
         {
           AutoHomeIconNum = 0;
           active_extruder = 0;
@@ -1608,7 +1608,7 @@ void RTSSHOW::RTS_HandleData()
           {
             current_position_x1_axis = X2_MAX_POS;
           }
-          else if((TEST(axis_trusted, X_AXIS)) && (current_position_x1_axis < (current_position_x0_axis - X_MIN_POS)))
+          else if((TEST(axes_trusted, X_AXIS)) && (current_position_x1_axis < (current_position_x0_axis - X_MIN_POS)))
           {
             current_position_x1_axis = current_position_x0_axis - X_MIN_POS;
           }
@@ -1633,7 +1633,7 @@ void RTSSHOW::RTS_HandleData()
           {
             current_position_x0_axis = X_MIN_POS;
           }
-          else if((TEST(axis_trusted, X_AXIS)) && (current_position_x0_axis > (current_position_x1_axis + X_MIN_POS)))
+          else if((TEST(axes_trusted, X_AXIS)) && (current_position_x0_axis > (current_position_x1_axis + X_MIN_POS)))
           {
             current_position_x0_axis = current_position_x1_axis + X_MIN_POS;
           }
@@ -1971,8 +1971,13 @@ void RTSSHOW::RTS_HandleData()
               queue.enqueue_now_P(PSTR("M605 S2 X68 R0"));
               queue.enqueue_now_P(PSTR("M605 S3"));
               break;
+            case 4:
+              queue.enqueue_now_P(PSTR("M605 S1"));
+              queue.enqueue_now_P(PSTR("T1"));
+              break;
             default:
-              queue.enqueue_now_P(PSTR("M605 S0"));
+              queue.enqueue_now_P(PSTR("M605 S1"));
+              queue.enqueue_now_P(PSTR("T0"));
               break;
           }
         #endif
@@ -1981,9 +1986,7 @@ void RTSSHOW::RTS_HandleData()
           power_off_type_yes = 1;
           Update_Time_Value = 0;
           RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
-          // recovery.resume();
-          queue.enqueue_now_P(PSTR("M1000"));
-
+          recovery.resume();
           PoweroffContinue = true;
           sdcard_pause_check = true;
           zprobe_zoffset = probe.offset.z;
@@ -2138,8 +2141,13 @@ void RTSSHOW::RTS_HandleData()
             queue.enqueue_now_P(PSTR("M605 S2 X68 R0"));
             queue.enqueue_now_P(PSTR("M605 S3"));
             break;
+          case 4:
+            queue.enqueue_now_P(PSTR("M605 S1"));
+            queue.enqueue_now_P(PSTR("T1"));
+            break;
           default:
-            queue.enqueue_now_P(PSTR("M605 S0"));
+            queue.enqueue_now_P(PSTR("M605 S1"));
+            queue.enqueue_now_P(PSTR("T0"));
             break;
         }
         queue.enqueue_one_now(cmd);
@@ -2205,7 +2213,7 @@ void RTSSHOW::RTS_HandleData()
             zig ^= true;
             for (int x = inStart; x != inStop; x += inInc)
             {
-              RTS_SndData(z_values[x][y] * 1000, AUTO_BED_LEVEL_1POINT_VP + showcount * 2);
+              RTS_SndData(bedlevel.z_values[x][y] * 1000, AUTO_BED_LEVEL_1POINT_VP + showcount * 2);
               showcount++;
             }
           }
