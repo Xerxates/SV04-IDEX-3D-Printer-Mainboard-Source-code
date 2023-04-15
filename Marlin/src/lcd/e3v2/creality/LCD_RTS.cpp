@@ -1286,6 +1286,7 @@ void RTSSHOW::RTS_HandleData()
         queue.enqueue_now_P(PSTR("G28"));
         queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
         RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
+        
 
         if (active_extruder == 0)
         {
@@ -2477,14 +2478,15 @@ void EachMomentUpdate()
     else
     {
       // need to optimize
-      if(recovery.info.print_job_elapsed != 0)
+      if(card.isPrinting())
       {
         duration_t elapsed = print_job_timer.duration();
         static unsigned char last_cardpercentValue = 100;
         rtscheck.RTS_SndData(elapsed.value / 3600, PRINT_TIME_HOUR_VP);
         rtscheck.RTS_SndData((elapsed.value % 3600) / 60, PRINT_TIME_MIN_VP);
-
-        if(card.isPrinting() && (last_cardpercentValue != card.percentDone()))
+        rtscheck.RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
+        
+        if(last_cardpercentValue != card.percentDone())
         {
           if((unsigned char) card.percentDone() > 0)
           {
@@ -2521,7 +2523,6 @@ void EachMomentUpdate()
           }
           rtscheck.RTS_SndData((unsigned char)card.percentDone(), PRINT_PROCESS_VP);
           last_cardpercentValue = card.percentDone();
-          rtscheck.RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
         }
       }
 
@@ -2541,6 +2542,8 @@ void EachMomentUpdate()
       rtscheck.RTS_SndData(thermalManager.temp_hotend[0].celsius, HEAD0_CURRENT_TEMP_VP);
       rtscheck.RTS_SndData(thermalManager.temp_hotend[1].celsius, HEAD1_CURRENT_TEMP_VP);
       rtscheck.RTS_SndData(thermalManager.temp_bed.celsius, BED_CURRENT_TEMP_VP);
+      rtscheck.RTS_SndData((int)round(thermalManager.fan_speed[0]/2.55), FAN_SPEED_E0_VP);
+      rtscheck.RTS_SndData((int)round(thermalManager.fan_speed[1]/2.55), FAN_SPEED_E1_VP);
 
       if((last_target_temperature[0] != thermalManager.temp_hotend[0].target) || (last_target_temperature[1] != thermalManager.temp_hotend[1].target) || (last_target_temperature_bed != thermalManager.temp_bed.target))
       {
