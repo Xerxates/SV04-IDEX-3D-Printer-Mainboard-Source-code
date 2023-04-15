@@ -1479,7 +1479,14 @@ void RTSSHOW::RTS_HandleData()
       }
       else if (recdat.data[0] == 4)
       {
-        RTS_SndData(ExchangePageBase + 28, ExchangepageAddr);
+        if (!all_axes_trusted()) {
+            queue.enqueue_now_P(PSTR("G28"));
+            waitway = 10;
+            RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
+        }
+        else {
+            RTS_SndData(ExchangePageBase + 28, ExchangepageAddr);
+        }
         if(active_extruder == 0)
         {
           RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
@@ -2756,6 +2763,11 @@ void RTS_MoveAxisHoming()
   {
     // Click Print finish
     rtscheck.RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
+    waitway = 0;
+  }
+   else if(waitway == 10)
+  {
+    rtscheck.RTS_SndData(ExchangePageBase + 28, ExchangepageAddr);
     waitway = 0;
   }
   if(active_extruder == 0)
