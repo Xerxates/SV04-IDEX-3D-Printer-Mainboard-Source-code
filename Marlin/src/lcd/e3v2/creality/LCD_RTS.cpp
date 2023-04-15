@@ -1277,16 +1277,20 @@ void RTSSHOW::RTS_HandleData()
         // Motor Icon
         RTS_SndData(0, MOTOR_FREE_ICON_VP);
         // only for prohibiting to receive massage
-        waitway = 6;
+        //waitway = 6;
         AutoHomeIconNum = 0;
         active_extruder = 0;
         active_extruder_flag = false;
         active_extruder_font = active_extruder;
         Update_Time_Value = 0;
-        queue.enqueue_now_P(PSTR("G28"));
-        queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
-        RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
-        
+        //queue.enqueue_now_P(PSTR("G28"));
+        //queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
+        //RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
+        #if ENABLED(HAS_LEVELING)
+          rtscheck.RTS_SndData(ExchangePageBase + 22, ExchangepageAddr);
+        #else
+          rtscheck.RTS_SndData(ExchangePageBase + 28, ExchangepageAddr);
+        #endif
 
         if (active_extruder == 0)
         {
