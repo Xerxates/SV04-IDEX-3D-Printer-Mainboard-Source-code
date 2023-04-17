@@ -22,6 +22,7 @@
 
 #include "../gcode.h"
 #include "../../module/tool_change.h"
+#include "../../module/temperature.h"
 #include "../../MarlinCore.h"
 #if EITHER(HAS_MULTI_EXTRUDER, DEBUG_LEVELING_FEATURE)
   #include "../../module/motion.h"
@@ -60,6 +61,13 @@ void GcodeSuite::T(const int8_t tool_index) {
       return;
     }
   #endif
+  
+  #if ENABLED(DUAL_X_CARRIAGE)
+    if (dxc_is_parked() && !idex_is_duplicating()) {
+      thermalManager.set_fan_speed(tool_index, thermalManager.fan_speed[active_extruder]);
+      thermalManager.set_fan_speed(active_extruder, 0);
+    }
+  #endif
 
   tool_change(tool_index
     #if HAS_MULTI_EXTRUDER
@@ -67,5 +75,6 @@ void GcodeSuite::T(const int8_t tool_index) {
       || parser.boolval('S')
     #endif
   );
+  
   active_extruder_font = parser.boolval('S');
 }

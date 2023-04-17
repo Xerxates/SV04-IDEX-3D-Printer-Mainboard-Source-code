@@ -91,13 +91,13 @@ void GcodeSuite::M106() {
   thermalManager.set_fan_speed(pfan, speed);
 
   TERN_(LASER_SYNCHRONOUS_M106_M107, planner.buffer_sync_block(BLOCK_BIT_SYNC_FANS));
-  #if ENABLED(DUAL_X_CARRIAGE)
+  /* #if ENABLED(DUAL_X_CARRIAGE)
     if (dxc_is_parked())
     {
       thermalManager.set_fan_speed(0, speed);
       thermalManager.set_fan_speed(1, speed);
     }
-  #endif
+  # */
   TERN_(LASER_SYNCHRONOUS_M106_M107, planner.buffer_sync_block(BLOCK_FLAG_SYNC_FANS));
 
   if (TERN0(DUAL_X_CARRIAGE, idex_is_duplicating()))  // pfan == 0 when duplicating
