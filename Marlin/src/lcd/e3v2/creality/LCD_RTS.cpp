@@ -1386,8 +1386,23 @@ void RTSSHOW::RTS_HandleData()
       {
         RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
       }
+      else if (recdat.data[0] == 10)
+      {
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[X_AXIS], MAX_X_ACCEL_VP);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[Y_AXIS], MAX_Y_ACCEL_VP);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[Z_AXIS], MAX_Z_ACCEL_VP);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(0)], MAX_E0_ACCEL_VP);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(1)], MAX_E1_ACCEL_VP);
+      RTS_SndData(planner.max_jerk[X_AXIS] * 10, MAX_X_JERK_VP);
+      RTS_SndData(planner.max_jerk[Y_AXIS] * 10, MAX_Y_JERK_VP);
+      RTS_SndData(planner.max_jerk[Z_AXIS] * 10, MAX_Z_JERK_VP);
+      RTS_SndData(planner.max_jerk[E_AXIS] * 10, MAX_E_JERK_VP);
+      RTS_SndData(planner.settings.acceleration, DEFAULT_PRINTING_ACCEL_VP);
+      RTS_SndData(planner.settings.retract_acceleration, DEFAULT_RETRACT_ACCEL_VP);
+      RTS_SndData(planner.settings.travel_acceleration, DEFAULT_TRAVEL_ACCEL_VP);
+      RTS_SndData(ExchangePageBase + 59, ExchangepageAddr);
+      }
       break;
-
     case SettingBackKey:
       if (recdat.data[0] == 1)
       {
@@ -1427,6 +1442,17 @@ void RTSSHOW::RTS_HandleData()
           #else
             RTS_SndData(ExchangePageBase + 21, ExchangepageAddr);
           #endif
+      }
+      else if (recdat.data[0] == 5) {
+        if (PrintFlag == 2) {
+          RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
+        }
+        else if (PrintFlag == 1) {
+          RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
+        }
+        else {
+          RTS_SndData(ExchangePageBase + 21, ExchangepageAddr);
+        }
       }
       break;
 
@@ -2420,7 +2446,54 @@ void RTSSHOW::RTS_HandleData()
       RTS_SndData(thermalManager.temp_hotend[1].target, HEAD1_SET_TEMP_VP);
       RTS_SndData(thermalManager.temp_bed.target, BED_SET_TEMP_VP);
       break;
-
+    case MaxXAccelKey:
+      planner.set_max_acceleration(X_AXIS, recdat.data[0]);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[X_AXIS], MAX_X_ACCEL_VP);
+      break;
+    case MaxYAccelKey:
+      planner.set_max_acceleration(Y_AXIS, recdat.data[0]);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[Y_AXIS], MAX_Y_ACCEL_VP);
+      break;
+    case MaxZAccelKey:
+      planner.set_max_acceleration(Z_AXIS, recdat.data[0]);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[Z_AXIS], MAX_Z_ACCEL_VP);
+      break;
+    case MaxE0AccelKey:
+      planner.set_max_acceleration(E_AXIS_N(0), recdat.data[0]);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(0)], MAX_E0_ACCEL_VP);
+      break;
+    case MaxE1AccelKey:
+      planner.set_max_acceleration(E_AXIS_N(1), recdat.data[0]);
+      RTS_SndData(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(1)], MAX_E1_ACCEL_VP);
+      break;
+    case MaxXJerkKey:
+      planner.set_max_jerk(X_AXIS, recdat.data[0] * 0.1);
+      RTS_SndData(planner.max_jerk[X_AXIS] * 10, MAX_X_JERK_VP);
+      break;
+    case MaxYJerkKey:
+      planner.set_max_jerk(Y_AXIS, recdat.data[0] * 0.1);
+      RTS_SndData(planner.max_jerk[Y_AXIS] * 10, MAX_Y_JERK_VP);
+      break;
+    case MaxZJerkKey:
+      planner.set_max_jerk(Z_AXIS, recdat.data[0] * 0.1);
+      RTS_SndData(planner.max_jerk[Z_AXIS] * 10, MAX_Z_JERK_VP);
+      break;
+    case MaxEJerkKey:
+      planner.set_max_jerk(E_AXIS, recdat.data[0] * 0.1);
+      RTS_SndData(planner.max_jerk[E_AXIS] * 10, MAX_E_JERK_VP);
+      break;
+    case PrintAccelKey:
+      planner.settings.acceleration = recdat.data[0];
+      RTS_SndData(planner.settings.acceleration, DEFAULT_PRINTING_ACCEL_VP);
+      break;
+    case RetractAccelKey:
+      planner.settings.retract_acceleration = recdat.data[0];
+      RTS_SndData(planner.settings.retract_acceleration, DEFAULT_RETRACT_ACCEL_VP);
+      break;
+    case TravelAccelKey:
+      planner.settings.travel_acceleration = recdat.data[0];
+      RTS_SndData(planner.settings.travel_acceleration, DEFAULT_TRAVEL_ACCEL_VP);
+      break;
     default:
       break;
   }

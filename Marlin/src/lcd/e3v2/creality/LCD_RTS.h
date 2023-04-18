@@ -119,13 +119,26 @@ extern int power_off_type_yes;
 //#define FILE19_SELECT_ICON_VP              0x1233
 //#define FILE20_SELECT_ICON_VP              0x1234
 
-#define FLOW_RATE_E0_VP                       0x1300
-#define FLOW_RATE_E1_VP                       0x1302
-#define FAN_SPEED_E0_VP                       0x1304
-#define FAN_SPEED_E1_VP                       0x1306
+#define FLOW_RATE_E0_VP                      0x1300
+#define FLOW_RATE_E1_VP                      0x1302
+#define FAN_SPEED_E0_VP                      0x1304
+#define FAN_SPEED_E1_VP                      0x1306
 
-#define PAGE_STATUS_TEXT_VP                0x201E
-#define FILE1_TEXT_VP                      0x205A
+#define MAX_X_ACCEL_VP                       0x1307
+#define MAX_Y_ACCEL_VP                       0x1308
+#define MAX_Z_ACCEL_VP                       0x1309
+#define MAX_E0_ACCEL_VP                      0x1310
+#define MAX_E1_ACCEL_VP                      0x1311
+#define MAX_X_JERK_VP                        0x1312
+#define MAX_Y_JERK_VP                        0x1313
+#define MAX_Z_JERK_VP                        0x1314
+#define MAX_E_JERK_VP                        0x1315
+#define DEFAULT_PRINTING_ACCEL_VP            0x1316
+#define DEFAULT_RETRACT_ACCEL_VP             0x1317
+#define DEFAULT_TRAVEL_ACCEL_VP              0x1318
+
+#define PAGE_STATUS_TEXT_VP                  0x201E
+#define FILE1_TEXT_VP                        0x205A
 //#define FILE3_TEXT_VP                      0x2032
 //#define FILE4_TEXT_VP                      0x2046
 //#define FILE5_TEXT_VP                      0x205A
@@ -263,7 +276,19 @@ enum PROC_COM
   FlowRateE0Key,
   FlowRateE1Key,
   FanSpeedE0Key,
-  FanSpeedE1Key
+  FanSpeedE1Key,
+  MaxXAccelKey,
+  MaxYAccelKey,
+  MaxZAccelKey,
+  MaxE0AccelKey,
+  MaxE1AccelKey,
+  MaxXJerkKey,
+  MaxYJerkKey,
+  MaxZJerkKey,
+  MaxEJerkKey,
+  PrintAccelKey,
+  RetractAccelKey,
+  TravelAccelKey,
 };
 
 const unsigned long Addrbuf[] = 
@@ -307,6 +332,18 @@ const unsigned long Addrbuf[] =
   0x1302,
   0x1304,
   0x1306,
+  0x1307,
+  0x1308,
+  0x1309,
+  0x1310,
+  0x1311,
+  0x1312,
+  0x1313,
+  0x1314,
+  0x1315,
+  0x1316,
+  0x1317,
+  0x1318,
   0
 };
 
