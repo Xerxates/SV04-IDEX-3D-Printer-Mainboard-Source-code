@@ -1,5 +1,6 @@
 # Features
 
+- Updated to Marlin v2.1.2
 - Input Shaping enabled: https://marlinfw.org/docs/gcode/M593.html & https://github.com/MarlinFirmware/Marlin/pull/24797
 - Z-Axis steppers won't be turned off anymore
 - Entering the Leveling menu on the LCD won't trigger an Auto Home every time now
